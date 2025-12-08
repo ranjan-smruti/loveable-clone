@@ -2,7 +2,7 @@ package com.project.loveable_clone.controller;
 
 import com.project.loveable_clone.dto.member.InviteMemberRequest;
 import com.project.loveable_clone.dto.member.MemberResponse;
-import com.project.loveable_clone.entity.ProjectMember;
+import com.project.loveable_clone.dto.member.UpdateMemberRoleRequest;
 import com.project.loveable_clone.service.ProjectMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ public class ProjectMemberController {
     private final ProjectMemberService projectMemberService;
 
     @GetMapping
-    public ResponseEntity<List<ProjectMember>> getProjectMember(@PathVariable Long projectId)
+    public ResponseEntity<List<MemberResponse>> getProjectMember(@PathVariable Long projectId)
     {
         Long userId = 1L;
         return ResponseEntity.ok(projectMemberService.getProjectMembers(projectId, userId));
@@ -33,7 +33,7 @@ public class ProjectMemberController {
     }
 
     @PatchMapping("/{memberId}")
-    public ResponseEntity<MemberResponse> updateMemberRole (@PathVariable Long projectId, @PathVariable Long memberId, @RequestBody InviteMemberRequest request)
+    public ResponseEntity<MemberResponse> updateMemberRole (@PathVariable Long projectId, @PathVariable Long memberId, @RequestBody UpdateMemberRoleRequest request)
     {
         Long userId = 1L;
         return ResponseEntity.ok(projectMemberService.updateMemberRole(projectId, memberId, request, userId));

@@ -4,7 +4,6 @@ import com.project.loveable_clone.dto.subscription.*;
 import com.project.loveable_clone.service.PlanService;
 import com.project.loveable_clone.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
