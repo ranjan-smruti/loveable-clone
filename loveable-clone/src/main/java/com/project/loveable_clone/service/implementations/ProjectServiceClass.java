@@ -1,5 +1,6 @@
 package com.project.loveable_clone.service.implementations;
 
+import com.project.loveable_clone.ExceptionHandler.ResourceNotFoundException;
 import com.project.loveable_clone.dto.project.ProjectRequest;
 import com.project.loveable_clone.dto.project.ProjectResponse;
 import com.project.loveable_clone.dto.project.ProjectSummaryResponse;
@@ -13,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,22 +55,40 @@ public class ProjectServiceClass implements ProjectService {
     }
 
     @Override
-    public ProjectResponse getUserProjectById(Long id, Long userId) {
+    public ProjectResponse getUserProjectById(Long projectId, Long userId) {
 
-        UserEntity user = userRepository.findById(userId).orElseThrow();
+        //UserEntity user = userRepository.findById(userId).orElseThrow();
         //Check if the user exists or not.
 
-        Project project = projectRepository.findUserProjectsById(userId, id);
+        Project project = getAccessibleProjectById(projectId, userId);
         return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public ProjectResponse updateProject(Long id, ProjectRequest request, Long userId) {
-        return null;
+        Project project = getAccessibleProjectById(id, userId);
+        if(!project.getOwner().getId().equals(userId)){
+            throw new RuntimeException("You are not the owner of this project");
+        }
+
+        project.setName(request.name());
+        project = projectRepository.save(project);
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public void softDelete(Long id, Long userId) {
+        Project project = getAccessibleProjectById(id, userId);
+        if(!project.getOwner().getId().equals(userId)){
+            throw new RuntimeException("You are not allowed to delete this project");
+        }
 
+        project.setDeletedAt(Instant.now());
+        projectRepository.save(project);
+    }
+
+    //INTERNAL FUNCTIONS
+    private Project getAccessibleProjectById(Long projectId, Long userId){
+        return projectRepository.findUserProjectsById(projectId,userId).orElseThrow(() -> new ResourceNotFoundException ("Not accessible by this user"));
     }
 }

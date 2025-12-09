@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,11 +18,12 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<APIResponse<?>> handleEmployeeNotFound(ResourceNotFoundException ex){
+    public ResponseEntity<APIResponse<?>> handleResourceNotFound(ResourceNotFoundException ex){
         ApiResponse apiError = ApiResponse
                 .builder()
                 .status(HttpStatus.NOT_FOUND)
                 .msg(ex.getMessage())
+                .subErrors(Collections.singletonList(ex.getMessage()))
                 .build();
         return buildErrorResponseEntity(apiError);
     }
@@ -94,6 +96,7 @@ public class GlobalExceptionHandler {
 //    }
 
     public ResponseEntity<APIResponse<?>> handleInternalServerError(Exception exception) {
+
         ApiResponse apiError = ApiResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .msg(exception.getMessage())
