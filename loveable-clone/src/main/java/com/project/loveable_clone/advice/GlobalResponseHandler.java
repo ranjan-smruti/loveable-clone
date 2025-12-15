@@ -1,4 +1,4 @@
-package com.project.loveable_clone.GlobalAPIResponseHandler;
+package com.project.loveable_clone.advice;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -25,9 +25,9 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                 .stream()
                 .anyMatch(route -> request.getURI().getPath().contains(route));
 
-        if(body instanceof APIResponse<?> || isAllowed) {
+        if(body instanceof ApiResponse<?> || isAllowed) {
             return body;
         }
-        return  new APIResponse<>(body);
+        return  new ApiResponse<>(body);
     }
 }

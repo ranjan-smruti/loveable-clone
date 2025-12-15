@@ -1,6 +1,7 @@
 package com.project.loveable_clone.service.implementations;
 
-import com.project.loveable_clone.ExceptionHandler.UnauthorizedException;
+import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
+import com.project.loveable_clone.advice.exceptions.UnauthorizedAccessException;
 import com.project.loveable_clone.dto.member.InviteMemberRequest;
 import com.project.loveable_clone.dto.member.MemberResponse;
 import com.project.loveable_clone.dto.member.UpdateMemberRoleRequest;
@@ -28,34 +29,26 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
 
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectRepository projectRepository;
-    private MemberResponseMapper memberResponseMapper;
+    private final MemberResponseMapper memberResponseMapper;
     private final UserRepository userRepository;
 
     @Override
     public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
         Project project = getAccessibleProjectById(projectId, userId);
-
-        List<MemberResponse> memberResponseList = new ArrayList<>();
-        memberResponseList.add(memberResponseMapper.toProjectMemberResponseFromOwner(project.getOwner()));
-
-        memberResponseList.addAll(
-                projectMemberRepository.findByIdProjectId(projectId)
-                        .stream()
-                        .map(memberResponseMapper::toProjectMemberResponseFromMember)
-                        .toList());
-
-        return memberResponseList;
+        return projectMemberRepository.findByIdProjectId(projectId)
+                .stream()
+                .map(memberResponseMapper::toProjectMemberResponseFromMember)
+                .toList();
     }
 
     @Override
     public MemberResponse inviteMember(Long projectId, InviteMemberRequest request, Long userId) {
         Project project = getAccessibleProjectById(projectId, userId);
 
-        if(!project.getOwner().getId().equals(userId)){
-            throw new RuntimeException("Not allowed to invite member");
-        }
-
-        UserEntity invitee = userRepository.findByEmail(request.email()).orElseThrow();
+        //TODO: if userName is not found throw exception userName not found.
+        UserEntity invitee = userRepository.findByUsername(request.email()).orElseThrow(
+                () -> new ResourceNotFoundException("User " , request.email())
+        );
 
         if(invitee.getId().equals(userId)){
             throw new RuntimeException("Cannot invite yourself");
@@ -82,13 +75,12 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
 
     @Override
     public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId) {
+
         Project project = getAccessibleProjectById(projectId, userId);
 
-        if(!project.getOwner().getId().equals(userId)){
-            throw new RuntimeException("Not owner, cannot update member role");
-        }
-
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
+
+        //TODO: return proper message if member is not associated with the project.
         ProjectMember member = projectMemberRepository.findById(projectMemberId).orElseThrow();
 
         member.setRole(request.role());
@@ -100,10 +92,6 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     @Override
     public void removeProjectMember(Long projectId, Long memberId, Long userId) {
         Project project = getAccessibleProjectById(projectId, userId);
-
-        if(!project.getOwner().getId().equals(userId)){
-            throw new RuntimeException("Not owner, cannot remove member.");
-        }
 
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
         if(!projectMemberRepository.existsById(projectMemberId))
@@ -117,6 +105,7 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
 
     //INTERNAL FUNCTIONS
     private Project getAccessibleProjectById(Long projectId, Long userId){
-        return projectRepository.findUserProjectsById(projectId,userId).orElseThrow(() -> new UnauthorizedException("Not accessible this user"));
+        //TODO: add validation to handle if the combination exists or not (project+userid)
+        return projectRepository.findAccessibleById(projectId,userId).orElseThrow(() -> new UnauthorizedAccessException("Not accessible this user"));
     }
 }

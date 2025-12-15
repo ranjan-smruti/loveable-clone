@@ -9,4 +9,6 @@ public interface AuthService {
     AuthResponse signup(SignupRequest request);
 
     AuthResponse login(LoginRequest request);
+
+    //TODO: implement logout
 }

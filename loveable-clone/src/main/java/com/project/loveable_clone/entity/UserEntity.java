@@ -20,14 +20,12 @@ public class UserEntity {
     private Long id;
 
     //@Column(nullable = false)
-    private String email;
+    private String username;
 
-    private String passwordHash;
+    private String password;
 
     //@Column(nullable=false)
     private String name;
-
-    private String avatarUrl;
 
     //Instant can store UTC time.
     @CreationTimestamp

@@ -14,7 +14,7 @@ public interface MemberResponseMapper {
     MemberResponse toProjectMemberResponseFromOwner(UserEntity owner);
 
     @Mapping(target="userId", source="user.id")
-    @Mapping(target="email", source="user.email")
+    @Mapping(target="userName", source="user.username")
     @Mapping(target="name", source="user.name")
     MemberResponse toProjectMemberResponseFromMember(ProjectMember projectMember);
 }
