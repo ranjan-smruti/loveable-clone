@@ -19,42 +19,34 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    //TODO: Should have another endpoint to get all he user projects(own+invited)
-
     @GetMapping
     public ResponseEntity<List<ProjectSummaryResponse>> getMyProject(){
-        //TODO: update later with real Spring Security
-        Long userId =  2L;
-        return ResponseEntity.ok(projectService.getUserProjects(userId));
+        return ResponseEntity.ok(projectService.getUserProjects());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id)
     {
-        Long userId = 2L;
-        return ResponseEntity.ok(projectService.getUserProjectById(id, userId));
+        return ResponseEntity.ok(projectService.getUserProjectById(id));
     }
 
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(@RequestBody @Valid ProjectRequest request)
     {
-        Long userId = 3L;
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id,
                                                          @RequestBody @Valid ProjectRequest request)
     {
-        Long userId = 2L;
-        return ResponseEntity.ok(projectService.updateProject(id,request,userId));
+        return ResponseEntity.ok(projectService.updateProject(id,request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id)
     {
-        Long userId = 1L;
-        projectService.softDelete(id, userId);
+        projectService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
 }

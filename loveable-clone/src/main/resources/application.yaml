@@ -20,3 +20,6 @@ server:
   servlet:
     context-path: /api
 
+jwt:
+  secret-key: ${JWT_TOKEN}
+

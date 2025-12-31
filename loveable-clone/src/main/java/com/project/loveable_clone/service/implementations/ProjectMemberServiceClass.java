@@ -13,13 +13,13 @@ import com.project.loveable_clone.mappers.MemberResponseMapper;
 import com.project.loveable_clone.repository.ProjectMemberRepository;
 import com.project.loveable_clone.repository.ProjectRepository;
 import com.project.loveable_clone.repository.UserRepository;
+import com.project.loveable_clone.security.AuthUtil;
 import com.project.loveable_clone.service.ProjectMemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,9 +31,12 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     private final ProjectRepository projectRepository;
     private final MemberResponseMapper memberResponseMapper;
     private final UserRepository userRepository;
+    private final AuthUtil authUtil;
 
     @Override
-    public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
+    public List<MemberResponse> getProjectMembers(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
+
         Project project = getAccessibleProjectById(projectId, userId);
         return projectMemberRepository.findByIdProjectId(projectId)
                 .stream()
@@ -42,7 +45,8 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request, Long userId) {
+    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
 
         //TODO: if userName is not found throw exception userName not found.
@@ -74,7 +78,8 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId) {
+    public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request) {
+        Long userId = authUtil.getCurrentUserId();
 
         Project project = getAccessibleProjectById(projectId, userId);
 
@@ -90,7 +95,8 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     }
 
     @Override
-    public void removeProjectMember(Long projectId, Long memberId, Long userId) {
+    public void removeProjectMember(Long projectId, Long memberId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
 
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
