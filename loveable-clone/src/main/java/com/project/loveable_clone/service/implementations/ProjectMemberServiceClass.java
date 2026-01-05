@@ -17,6 +17,7 @@ import com.project.loveable_clone.security.AuthUtil;
 import com.project.loveable_clone.service.ProjectMemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -34,6 +35,7 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     private final AuthUtil authUtil;
 
     @Override
+    @PreAuthorize("@security.hasPermissionToViewMembers(#projectId)")
     public List<MemberResponse> getProjectMembers(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
 
@@ -45,6 +47,7 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.hasPermissionToManageMembers(#projectId)")
     public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
         Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
@@ -78,6 +81,7 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.hasPermissionToManageMembers(#projectId)")
     public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request) {
         Long userId = authUtil.getCurrentUserId();
 
@@ -95,6 +99,7 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.hasPermissionToManageMembers(#projectId)")
     public void removeProjectMember(Long projectId, Long memberId) {
         Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);

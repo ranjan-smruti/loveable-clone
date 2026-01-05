@@ -6,6 +6,7 @@ import com.project.loveable_clone.advice.exceptions.UnauthorizedAccessException;
 import com.project.loveable_clone.advice.exceptions.UsernameNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -54,4 +55,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(apiError.status()).body(apiError);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationExceptionException(AuthenticationException ex)
+    {
+        ApiResponse<Void> apiError = new ApiResponse<>(HttpStatus.FORBIDDEN, ex.getMessage(), null);
+        return ResponseEntity.status(apiError.status()).body(apiError);
+    }
 }

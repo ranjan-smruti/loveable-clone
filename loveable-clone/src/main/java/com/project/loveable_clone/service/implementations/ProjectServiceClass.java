@@ -18,6 +18,7 @@ import com.project.loveable_clone.security.AuthUtil;
 import com.project.loveable_clone.service.ProjectService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -72,6 +73,7 @@ public class ProjectServiceClass implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@security.hasPermissionToView(#projectId)")
     public ProjectResponse getUserProjectById(Long projectId) {
 
         //UserEntity user = userRepository.findById(userId).orElseThrow();
@@ -82,6 +84,7 @@ public class ProjectServiceClass implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@security.hasPermissionToEdit(#projectId)")
     public ProjectResponse updateProject(Long id, ProjectRequest request) {
         Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(id, userId);
@@ -92,6 +95,7 @@ public class ProjectServiceClass implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@security.hasPermissionToDelete(#projectId)")
     public void softDelete(Long id) {
         Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(id, userId);

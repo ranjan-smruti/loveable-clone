@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,13 +19,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
+@EnableMethodSecurity
 public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver handlerExceptionResolver;
+    public WebSecurityConfig(
+            JwtAuthFilter jwtAuthFilter,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
@@ -48,11 +54,11 @@ public class WebSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler(){
-        //returning anonymous class
-        return (request, response, accessDeniedException) -> {
-            handlerExceptionResolver.resolveException(request,response,null,accessDeniedException);
-        };
-    }
+//    @Bean
+//    public AccessDeniedHandler accessDeniedHandler(){
+//        //returning anonymous class
+//        return (request, response, accessDeniedException) -> {
+//            handlerExceptionResolver.resolveException(request,response,null,accessDeniedException);
+//        };
+//    }
 }
