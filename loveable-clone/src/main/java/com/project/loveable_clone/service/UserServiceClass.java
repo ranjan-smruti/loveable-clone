@@ -1,9 +1,9 @@
-package com.project.loveable_clone.service.implementations;
+package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.advice.exceptions.UsernameNotFoundException;
 import com.project.loveable_clone.dto.auth.UserProfileResponse;
 import com.project.loveable_clone.repository.UserRepository;
-import com.project.loveable_clone.service.UserService;
+import com.project.loveable_clone.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

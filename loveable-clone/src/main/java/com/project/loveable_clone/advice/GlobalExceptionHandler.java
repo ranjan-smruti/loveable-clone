@@ -4,8 +4,10 @@ import com.project.loveable_clone.advice.exceptions.BadRequestException;
 import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
 import com.project.loveable_clone.advice.exceptions.UnauthorizedAccessException;
 import com.project.loveable_clone.advice.exceptions.UsernameNotFoundException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,7 +60,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse<Void>> handleAuthenticationExceptionException(AuthenticationException ex)
     {
-        ApiResponse<Void> apiError = new ApiResponse<>(HttpStatus.FORBIDDEN, ex.getMessage(), null);
+        ApiResponse<Void> apiError = new ApiResponse<>(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+        return ResponseEntity.status(apiError.status()).body(apiError);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException ex) {
+        ApiResponse<Void> apiError = new ApiResponse<>( HttpStatus.FORBIDDEN, "Access denied: Insufficient permissions", null);
+        return ResponseEntity.status(apiError.status()).body(apiError);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ApiResponse<Void>> handleJwtException(JwtException ex) {
+        ApiResponse<Void> apiError = new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Invalid JWT token: " + ex.getMessage(), null);
         return ResponseEntity.status(apiError.status()).body(apiError);
     }
 }

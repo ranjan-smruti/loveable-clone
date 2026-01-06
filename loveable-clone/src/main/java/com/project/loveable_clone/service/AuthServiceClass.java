@@ -1,4 +1,4 @@
-package com.project.loveable_clone.service.implementations;
+package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.advice.exceptions.BadRequestException;
 import com.project.loveable_clone.dto.auth.AuthResponse;
@@ -8,7 +8,7 @@ import com.project.loveable_clone.entity.UserEntity;
 import com.project.loveable_clone.mappers.UserMapper;
 import com.project.loveable_clone.repository.UserRepository;
 import com.project.loveable_clone.security.AuthUtil;
-import com.project.loveable_clone.service.AuthService;
+import com.project.loveable_clone.service.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

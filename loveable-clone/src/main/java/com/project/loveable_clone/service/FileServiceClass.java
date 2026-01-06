@@ -1,8 +1,8 @@
-package com.project.loveable_clone.service.implementations;
+package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.dto.project.FileContentResponse;
 import com.project.loveable_clone.dto.project.FileNode;
-import com.project.loveable_clone.service.FileService;
+import com.project.loveable_clone.service.interfaces.FileService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

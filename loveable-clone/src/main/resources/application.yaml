@@ -23,3 +23,9 @@ server:
 jwt:
   secret-key: ${JWT_TOKEN}
 
+stripe:
+  secret: ${STRIPE_SECRET}
+
+client:
+  url: http://localhost:8080
+

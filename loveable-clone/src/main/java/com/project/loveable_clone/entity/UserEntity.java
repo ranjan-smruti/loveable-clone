@@ -32,6 +32,9 @@ public class UserEntity implements UserDetails {
     //@Column(nullable=false)
     private String name;
 
+    @Column(unique = true)
+    private String stripeCustomerId;
+
     //Instant can store UTC time.
     @CreationTimestamp
     private Instant createdAt;

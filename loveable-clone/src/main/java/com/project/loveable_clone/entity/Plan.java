@@ -1,13 +1,20 @@
 package com.project.loveable_clone.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
+@Entity
 public class Plan {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
+    @Column(unique = true)
     private String stripePriceId;
 
     //How many projects it can support, in free plan there maybe 2 in pro it may 5
@@ -26,5 +33,4 @@ public class Plan {
     private Boolean active;
 
     private String feature; //JSON of ARRAY
-
 }

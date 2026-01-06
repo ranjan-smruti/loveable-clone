@@ -1,8 +1,9 @@
 package com.project.loveable_clone.controller;
 
 import com.project.loveable_clone.dto.subscription.*;
-import com.project.loveable_clone.service.PlanService;
-import com.project.loveable_clone.service.SubscriptionService;
+import com.project.loveable_clone.service.interfaces.PaymentProcessor;
+import com.project.loveable_clone.service.interfaces.PlanService;
+import com.project.loveable_clone.service.interfaces.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ public class BillingController {
 
     private final PlanService planService;
     private final SubscriptionService subscriptionService;
+    private final PaymentProcessor paymentProcessor;
 
     @GetMapping("/plans")
     public ResponseEntity<List<PlanResponse>> getAllPlans()
@@ -26,21 +28,18 @@ public class BillingController {
     @GetMapping("/profile/subscription")
     public ResponseEntity<SubscriptionResponse> getMySubscription()
     {
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId));
+        return ResponseEntity.ok(subscriptionService.getCurrentSubscription());
     }
 
-    @PostMapping("/stripe/checkout")
+    @PostMapping("/payment/checkout")
     public ResponseEntity<CheckoutResponse> createCheckoutResponse(@RequestBody CheckoutRequest request)
     {
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.createCheckoutSessionUrl(request,userId));
+        return ResponseEntity.ok(paymentProcessor.createCheckoutSessionUrl(request));
     }
 
     @PostMapping("/stripe/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal()
     {
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.openCustomerPortal(userId));
+        return ResponseEntity.ok(paymentProcessor.openCustomerPortal());
     }
 }

@@ -1,4 +1,4 @@
-package com.project.loveable_clone.service.implementations;
+package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
 import com.project.loveable_clone.advice.exceptions.UnauthorizedAccessException;
@@ -15,7 +15,7 @@ import com.project.loveable_clone.repository.ProjectMemberRepository;
 import com.project.loveable_clone.repository.ProjectRepository;
 import com.project.loveable_clone.repository.UserRepository;
 import com.project.loveable_clone.security.AuthUtil;
-import com.project.loveable_clone.service.ProjectService;
+import com.project.loveable_clone.service.interfaces.ProjectService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,4 +1,4 @@
-package com.project.loveable_clone.service;
+package com.project.loveable_clone.service.interfaces;
 
 import com.project.loveable_clone.dto.member.InviteMemberRequest;
 import com.project.loveable_clone.dto.member.MemberResponse;

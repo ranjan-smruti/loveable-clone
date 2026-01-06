@@ -3,7 +3,7 @@ package com.project.loveable_clone.controller;
 import com.project.loveable_clone.dto.project.ProjectRequest;
 import com.project.loveable_clone.dto.project.ProjectResponse;
 import com.project.loveable_clone.dto.project.ProjectSummaryResponse;
-import com.project.loveable_clone.service.ProjectService;
+import com.project.loveable_clone.service.interfaces.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

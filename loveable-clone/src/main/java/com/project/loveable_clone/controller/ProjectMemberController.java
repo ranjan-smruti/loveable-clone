@@ -3,7 +3,7 @@ package com.project.loveable_clone.controller;
 import com.project.loveable_clone.dto.member.InviteMemberRequest;
 import com.project.loveable_clone.dto.member.MemberResponse;
 import com.project.loveable_clone.dto.member.UpdateMemberRoleRequest;
-import com.project.loveable_clone.service.ProjectMemberService;
+import com.project.loveable_clone.service.interfaces.ProjectMemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

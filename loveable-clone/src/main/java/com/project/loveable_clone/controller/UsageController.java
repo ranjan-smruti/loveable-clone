@@ -2,7 +2,7 @@ package com.project.loveable_clone.controller;
 
 import com.project.loveable_clone.dto.subscription.PlanLimitsResponse;
 import com.project.loveable_clone.dto.subscription.UsageTodayResponse;
-import com.project.loveable_clone.service.UsageService;
+import com.project.loveable_clone.service.interfaces.UsageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

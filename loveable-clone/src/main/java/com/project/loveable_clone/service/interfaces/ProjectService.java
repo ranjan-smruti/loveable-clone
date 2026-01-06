@@ -1,4 +1,4 @@
-package com.project.loveable_clone.service;
+package com.project.loveable_clone.service.interfaces;
 
 import com.project.loveable_clone.dto.project.ProjectRequest;
 import com.project.loveable_clone.dto.project.ProjectResponse;

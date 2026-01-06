@@ -13,9 +13,9 @@ public class Subscription {
     private UserEntity user;
     private Plan plan;
 
-    private String stripeCustomerId;
+    //private String stripeCustomerId;
     private String stripeSubscriptionId;
-    private SubscriptionStatus subscriptionStatus;
+    //private SubscriptionStatus subscriptionStatus;
 
     private Instant currentPeriodStart;
     private Instant currentPeriodEnd;

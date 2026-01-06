@@ -2,7 +2,7 @@ package com.project.loveable_clone.controller;
 
 import com.project.loveable_clone.dto.project.FileContentResponse;
 import com.project.loveable_clone.dto.project.FileNode;
-import com.project.loveable_clone.service.FileService;
+import com.project.loveable_clone.service.interfaces.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
