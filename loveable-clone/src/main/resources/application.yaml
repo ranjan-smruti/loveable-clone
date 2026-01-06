@@ -24,7 +24,10 @@ jwt:
   secret-key: ${JWT_TOKEN}
 
 stripe:
-  secret: ${STRIPE_SECRET}
+  api:
+    secret: ${STRIPE_SECRET}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
 
 client:
   url: http://localhost:8080

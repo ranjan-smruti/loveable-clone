@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
@@ -55,6 +56,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
                 )
                 .setSuccessUrl(frontendUrl + "/success.html?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl(frontendUrl + "/cancel.html")
+                //.setExpiresAt(Instant.now().plusSeconds(60*10).getEpochSecond())
                 .putMetadata("user_id", userId.toString()) //metadata will be sent back by the webhook.
                 .putMetadata("plan_id", plan.getId().toString());
 

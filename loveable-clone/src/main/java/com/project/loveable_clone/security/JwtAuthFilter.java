@@ -37,7 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String requestPath = request.getServletPath();
-        List<String> publicRoutes = List.of("/auth/");
+        List<String> publicRoutes = List.of("/auth/", "/webhooks/");
         return publicRoutes.stream().anyMatch(requestPath::startsWith);
     }
 

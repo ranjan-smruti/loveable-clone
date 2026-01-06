@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @Entity
@@ -16,6 +18,8 @@ public class Plan {
 
     @Column(unique = true)
     private String stripePriceId;
+
+    private BigDecimal price;
 
     //How many projects it can support, in free plan there maybe 2 in pro it may 5
     private Integer maxProjects;
