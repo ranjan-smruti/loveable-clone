@@ -1,39 +1,39 @@
 package com.project.loveable_clone.validators;
 
+import com.project.loveable_clone.enums.ProjectMemberRole;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class UserRoleValidator implements ConstraintValidator<ValidUserRole, String> {
+public class UserRoleValidator implements ConstraintValidator<ValidUserRole, ProjectMemberRole> {
 
-    private Set<String> allowedRoles;
+    private Set<ProjectMemberRole> allowedRoles;
 
     @Override
     public void initialize(ValidUserRole constraintAnnotation) {
-        allowedRoles = Arrays.stream(constraintAnnotation.enumClass().getEnumConstants())
-                .map(Enum::name)
-                .collect(Collectors.toSet());
+        allowedRoles = EnumSet.allOf(ProjectMemberRole.class);
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if(value == null || value.isEmpty()) {
-            return true;
+    public boolean isValid(ProjectMemberRole value,
+                           ConstraintValidatorContext context) {
+
+        if (value == null) {
+            return true; // @NotNull handles null
         }
 
-        boolean valid = allowedRoles.contains(value.toUpperCase());
-
-        if(!valid)
-        {
+        if (!allowedRoles.contains(value)) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                    "Invalid role '" + value + "'. Allowed values: " + allowedRoles
+                    "Invalid role '" + value +
+                            "'. Allowed values: " + allowedRoles
             ).addConstraintViolation();
+            return false;
         }
 
-        return valid;
+        return true;
     }
 }

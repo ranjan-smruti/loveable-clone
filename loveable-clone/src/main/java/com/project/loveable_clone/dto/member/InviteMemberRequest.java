@@ -7,6 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record InviteMemberRequest(
-        @NotBlank @ValidEmail String email,
+        @NotBlank @ValidEmail String username,
         @NotNull @ValidUserRole(enumClass = ProjectMemberRole.class) ProjectMemberRole role) {
 }

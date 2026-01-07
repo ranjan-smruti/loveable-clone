@@ -85,9 +85,9 @@ public class ProjectServiceClass implements ProjectService {
 
     @Override
     @PreAuthorize("@security.hasPermissionToEdit(#projectId)")
-    public ProjectResponse updateProject(Long id, ProjectRequest request) {
+    public ProjectResponse updateProject(Long projectId, ProjectRequest request) {
         Long userId = authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(id, userId);
+        Project project = getAccessibleProjectById(projectId, userId);
 
         project.setName(request.name());
         project = projectRepository.save(project);
@@ -96,9 +96,9 @@ public class ProjectServiceClass implements ProjectService {
 
     @Override
     @PreAuthorize("@security.hasPermissionToDelete(#projectId)")
-    public void softDelete(Long id) {
+    public void softDelete(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(id, userId);
+        Project project = getAccessibleProjectById(projectId, userId);
 
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);

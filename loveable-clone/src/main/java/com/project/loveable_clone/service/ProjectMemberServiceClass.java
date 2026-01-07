@@ -53,8 +53,8 @@ public class ProjectMemberServiceClass implements ProjectMemberService {
         Project project = getAccessibleProjectById(projectId, userId);
 
         //TODO: if userName is not found throw exception userName not found.
-        UserEntity invitee = userRepository.findByUsername(request.email()).orElseThrow(
-                () -> new ResourceNotFoundException("User " , request.email())
+        UserEntity invitee = userRepository.findByUsername(request.username()).orElseThrow(
+                () -> new ResourceNotFoundException("User " , request.username())
         );
 
         if(invitee.getId().equals(userId)){
