@@ -46,7 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try{
             final String requestHeaderToken = request.getHeader("Authorization");
 
-            if(requestHeaderToken == null || !requestHeaderToken.startsWith("Bearer")) {
+            if(requestHeaderToken == null || !requestHeaderToken.startsWith("Bearer ")) {
                 throw new AuthenticationCredentialsNotFoundException("Authorization header not found");
             }
 

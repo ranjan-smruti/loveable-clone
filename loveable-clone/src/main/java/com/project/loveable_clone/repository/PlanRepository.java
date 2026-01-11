@@ -4,9 +4,9 @@ import com.project.loveable_clone.dto.subscription.PlanResponse;
 import com.project.loveable_clone.entity.Plan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     @Query("""
@@ -23,4 +23,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
         ORDER BY p.id
     """)
     List<PlanResponse> getAllActivePlans();
+
+    Optional<Plan> findByStripePriceId(String stripePriceId);
 }
