@@ -1,5 +1,6 @@
 package com.project.loveable_clone.service;
 
+import com.project.loveable_clone.advice.exceptions.BadRequestException;
 import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
 import com.project.loveable_clone.advice.exceptions.UnauthorizedAccessException;
 import com.project.loveable_clone.dto.project.ProjectRequest;
@@ -16,6 +17,7 @@ import com.project.loveable_clone.repository.ProjectRepository;
 import com.project.loveable_clone.repository.UserRepository;
 import com.project.loveable_clone.security.AuthUtil;
 import com.project.loveable_clone.service.interfaces.ProjectService;
+import com.project.loveable_clone.service.interfaces.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,9 +36,15 @@ public class ProjectServiceClass implements ProjectService {
     private final UserRepository userRepository;
     private final ProjectMapper projectMapper;
     private final AuthUtil authUtil;
+    private final SubscriptionService subscriptionService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+
+        if(!subscriptionService.canCreateNewProject()){
+            throw new BadRequestException("User cannot create a new project with current plan, Upgrade plan now.");
+        }
+
         Long userId = authUtil.getCurrentUserId();
         UserEntity owner = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User ", userId.toString())

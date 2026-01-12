@@ -1,5 +1,6 @@
 package com.project.loveable_clone.service;
 
+import com.project.loveable_clone.advice.exceptions.BadRequestException;
 import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
 import com.project.loveable_clone.advice.exceptions.UsernameNotFoundException;
 import com.project.loveable_clone.dto.subscription.CheckoutRequest;
@@ -69,7 +70,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
             } else {
                 params.setCustomer(stripeCustomerId); // stripe customer Id
             }
-            Session session = Session.create(params.build()); // making api call to the Strip Backend
+            Session session = Session.create(params.build()); // making api call to the Stripe Backend
             return new CheckoutResponse(session.getUrl());
         } catch (StripeException e) {
             throw new RuntimeException(e);
@@ -78,7 +79,25 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public PortalResponse openCustomerPortal() {
-        return null;
+        Long userId = authUtil.getCurrentUserId();
+        UserEntity user = getUser(userId);
+        String stripeCustomerId = user.getStripeCustomerId();
+
+        if(stripeCustomerId == null || stripeCustomerId.isEmpty()){
+            throw new BadRequestException("User does not have a Stripe Customer Id, UserId: " + userId);
+        }
+
+        try{
+            var portalSession = com.stripe.model.billingportal.Session.create(
+              com.stripe.param.billingportal.SessionCreateParams.builder()
+                      .setCustomer(stripeCustomerId)
+                      .setReturnUrl(frontendUrl)
+                      .build()
+            );
+            return new PortalResponse(portalSession.getUrl());
+        }catch(StripeException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

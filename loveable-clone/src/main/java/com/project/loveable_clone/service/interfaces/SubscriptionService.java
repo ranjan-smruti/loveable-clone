@@ -12,14 +12,15 @@ public interface SubscriptionService {
     SubscriptionResponse getCurrentSubscription();
     void activateSubscription(Long userId, Long planId, String subscriptionId, String customerId);
 
-    void updateSubscription(String subscriptionId,
+    void updateSubscription(String gatewaySubscriptionId,
                             SubscriptionStatus subscriptionStatus,
                             Long planId,
                             Instant periodStart,
                             Instant periodEnd,
                             Boolean cancelAtPeriodEnd);
 
-    void cancelSubscription(String subscriptionId);
+    void cancelSubscription(String gatewaySubscriptionId);
     void renewSubscriptionPeriod(String subscriptionId, Instant periodStart, Instant periodEnd);
     void markSubscriptionPastDue(String subscriptionId);
+    boolean canCreateNewProject();
 }
