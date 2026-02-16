@@ -1,18 +1,38 @@
 package com.project.loveable_clone.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
+@Entity
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+//@Table(name="chat_sessions")
 public class ChatSession {
-    private Project project;
-    private UserEntity user;
-    private String title;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private Instant deletedAt;
+    @EmbeddedId
+    private ChatSessionId id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("projectId")
+    @JoinColumn(name="project_id", nullable = false, updatable = false)
+    private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("userId")
+    @JoinColumn(name="user_id", nullable = false, updatable = false)
+    private UserEntity user;
+
+    @CreationTimestamp
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
+
+    private Instant deletedAt; //soft delete
 }
