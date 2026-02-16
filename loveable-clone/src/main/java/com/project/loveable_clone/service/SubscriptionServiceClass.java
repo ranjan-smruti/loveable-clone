@@ -91,6 +91,7 @@ public class SubscriptionServiceClass implements SubscriptionService {
         }
 
         if(cancelAtPeriodEnd != null && cancelAtPeriodEnd != subscription.getCancelAtPeriodEnd()) {
+            //Note: This works when admin cancel the subscription from the dashboard, not working from user cancel.
             subscription.setCancelAtPeriodEnd(cancelAtPeriodEnd);
             hasSubscriptionUpdated = true;
         }

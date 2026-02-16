@@ -16,6 +16,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+  ai:
+    openai:
+      api-key: ${OPENAI_APIKEY}
+#      base-url:
+      chat:
+        options:
+          model: gpt-5.2-codex
+          temperature: 1 #default for gpt-5.x
+
+
 server:
   servlet:
     context-path: /api
