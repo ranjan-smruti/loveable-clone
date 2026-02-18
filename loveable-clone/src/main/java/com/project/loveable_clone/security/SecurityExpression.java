@@ -3,9 +3,11 @@ package com.project.loveable_clone.security;
 import com.project.loveable_clone.enums.ProjectPermission;
 import com.project.loveable_clone.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component("security")
+@Slf4j
 @RequiredArgsConstructor
 public class SecurityExpression {
     private final ProjectMemberRepository projectMemberRepository;

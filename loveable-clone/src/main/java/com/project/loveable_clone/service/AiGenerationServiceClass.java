@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
@@ -31,7 +32,7 @@ public class AiGenerationServiceClass implements AiGenerationService {
             .compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
 
     @Override
-    @PreAuthorize("@security.canEditProject(#projectId)")
+    @PreAuthorize("@security.hasPermissionToEdit(#projectId)")
     public Flux<String> streamResponse(String message, Long projectId){
         Long userId = authUtil.getCurrentUserId();
 
@@ -44,6 +45,7 @@ public class AiGenerationServiceClass implements AiGenerationService {
 
         StringBuilder fullResponseBuffer = new StringBuilder();
 
+        //TODO: track token use.
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT)
                 .user(message)
@@ -60,10 +62,13 @@ public class AiGenerationServiceClass implements AiGenerationService {
                             parseAndSaveFiles(fullResponseBuffer.toString(), projectId));
                 })
                 .doOnError(error -> log.error("Error during streaming for projectId: {}", projectId))
+                .filter(response -> Objects.requireNonNull(response.getResult()).getOutput().getText() != null)
                 .map(response -> Objects.requireNonNull(Objects.requireNonNull(response.getResult()).getOutput().getText()));
     }
 
     private void parseAndSaveFiles(String fullResponse, Long projectId) {
+//        While sending the file/project content in json will be complex from the frontend to parse and display as json
+//        contain {"key":"value"} pair. Sending with html tag will solve this issue.
 //        String dummy = """
 //                <message> I'm going to read the files and generate the code </message>
 //                <file path="src/App.jsx">

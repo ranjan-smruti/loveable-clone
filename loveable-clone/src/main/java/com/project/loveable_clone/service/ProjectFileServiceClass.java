@@ -1,6 +1,7 @@
 package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
+import com.project.loveable_clone.config.StorageConfig;
 import com.project.loveable_clone.dto.project.FileContentResponse;
 import com.project.loveable_clone.dto.project.FileNode;
 import com.project.loveable_clone.entity.Project;
@@ -33,7 +34,7 @@ public class ProjectFileServiceClass implements ProjectFileService {
     private final ProjectFileMapper projectFileMapper;
 
     @Value("${minio.project-bucket}")
-    private String projectBucket;
+    private String PROJECT_BUCKET;
 
     @Override
     public List<FileNode> getFileTree(Long projectId, Long userId) {
@@ -48,6 +49,7 @@ public class ProjectFileServiceClass implements ProjectFileService {
 
     @Override
     public void saveFile(Long projectId, String filePath, String fileContent) {
+        //Save metadata in postgres and file content in minio.
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project", projectId.toString())
         );
@@ -62,7 +64,8 @@ public class ProjectFileServiceClass implements ProjectFileService {
             //saving the file content
             minioClient.putObject(
             PutObjectArgs.builder()
-                    .bucket(projectBucket)
+                    //.bucket(projectBucket)
+                    .bucket(PROJECT_BUCKET)
                     .object(objectKey)
                     .stream(inputStream, contentBytes.length,-1)
                     .contentType(determineContentType(filePath))

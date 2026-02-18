@@ -7,6 +7,7 @@ import com.project.loveable_clone.advice.exceptions.UsernameNotFoundException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,6 +74,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ApiResponse<Void>> handleJwtException(JwtException ex) {
         ApiResponse<Void> apiError = new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Invalid JWT token: " + ex.getMessage(), null);
+        return ResponseEntity.status(apiError.status()).body(apiError);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex){
+        ApiResponse<Void> apiError = new ApiResponse<>(HttpStatus.BAD_REQUEST, "Invalid request body: " + ex.getMessage(), null);
         return ResponseEntity.status(apiError.status()).body(apiError);
     }
 }
