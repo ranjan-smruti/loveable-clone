@@ -1,6 +1,8 @@
 package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.llm.PromptUtils;
+import com.project.loveable_clone.llm.advisors.FileTreeContextAdvisor;
+import com.project.loveable_clone.llm.tools.CodeGenerationTools;
 import com.project.loveable_clone.security.AuthUtil;
 import com.project.loveable_clone.service.interfaces.AiGenerationService;
 import com.project.loveable_clone.service.interfaces.ProjectFileService;
@@ -27,6 +29,7 @@ public class AiGenerationServiceClass implements AiGenerationService {
     private final ChatClient chatClient;
     private final AuthUtil authUtil;
     private final ProjectFileService projectFileService;
+    private final FileTreeContextAdvisor fileTreeContextAdvisor;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern
             .compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
@@ -44,13 +47,16 @@ public class AiGenerationServiceClass implements AiGenerationService {
         );
 
         StringBuilder fullResponseBuffer = new StringBuilder();
+        CodeGenerationTools codeGenerationTool = new CodeGenerationTools(projectFileService, projectId);
 
         //TODO: track token use.
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT)
                 .user(message)
+                .tools(codeGenerationTool)
                 .advisors(advisorSpec -> {
                     advisorSpec.params(advisorParams);
+                    advisorSpec.advisors(fileTreeContextAdvisor);
                 }).stream()
                 .chatResponse()
                 .doOnNext(response -> {
@@ -85,7 +91,6 @@ public class AiGenerationServiceClass implements AiGenerationService {
         while (matcher.find()) {
             String filePath = matcher.group(1);
             String fileContent = matcher.group(2).trim();
-
             projectFileService.saveFile(projectId, filePath, fileContent);
         }
     }
