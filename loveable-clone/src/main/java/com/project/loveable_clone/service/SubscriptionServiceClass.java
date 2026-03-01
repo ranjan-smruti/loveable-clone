@@ -36,7 +36,7 @@ public class SubscriptionServiceClass implements SubscriptionService {
     private final SubscriptionMapper subscriptionMapper;
     private final ProjectMemberRepository projectMemberRepository;
 
-    private final Integer FREE_TIRE_PROJECTS_ALLOWED = 1;
+    private final Integer FREE_TIRE_PROJECTS_ALLOWED = 100;
 
     @Override
     public SubscriptionResponse getCurrentSubscription() {
