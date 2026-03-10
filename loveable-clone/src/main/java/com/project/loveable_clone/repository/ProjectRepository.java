@@ -1,6 +1,7 @@
 package com.project.loveable_clone.repository;
 
 import com.project.loveable_clone.entity.Project;
+import com.project.loveable_clone.enums.ProjectMemberRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,17 +14,14 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project,Long> {
 
     @Query("""
-        SELECT p FROM Project p
-        WHERE p.deletedAt IS NULL
-          AND EXISTS (
-               SELECT 1 FROM ProjectMember pm
-               WHERE pm.id.userId = :userId
-               AND pm.id.projectId = p.id
-          )
+        SELECT p as project, pm.role as role
+        FROM Project p
+        JOIN ProjectMember pm ON pm.project.id=p.id
+        WHERE pm.user.id=:userId
+        AND p.deletedAt IS NULL
         ORDER BY p.updatedAt DESC
-        """
-    )
-    List<Project> findAllAccessibleByUser(@Param("userId") Long userId);
+        """)
+    List<ProjectWithRole> findAllAccessibleByUser(@Param("userId") Long userId);
 
 
     @Query("""
@@ -35,9 +33,24 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
            WHERE pm.id.projectId = p.id
            AND pm.id.userId = :userId
       )
-    """
-    )
+    """)
     Optional<Project> findAccessibleById(
             @Param("projectId") Long projectId,
             @Param("userId") Long userId);
+
+
+    interface ProjectWithRole {
+        Project getProject();
+        ProjectMemberRole getRole();
+    }
+    @Query("""
+            SELECT p as project, pm.role as role
+            FROM Project p
+            JOIN ProjectMember pm ON pm.project.id = p.id
+            WHERE p.id = :projectId
+              AND pm.user.id = :userId
+              AND p.deletedAt IS NULL
+            """)
+    Optional<ProjectWithRole> findAccessibleProjectByIdWithRole(@Param("projectId") Long projectId,
+                                                                @Param("userId") Long userId);
 }

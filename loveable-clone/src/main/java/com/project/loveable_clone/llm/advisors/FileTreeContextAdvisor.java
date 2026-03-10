@@ -53,7 +53,7 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
         }
 
         //Get all the file path for this project id from db.
-        List<FileNode> fileTree = projectFileService.getFileTree(projectId);
+        List<FileNode> fileTree = projectFileService.getFileTree(projectId).files();
 
         String fileTreeContext = "\n\n ---- FILE_TREE ---- \n" + fileTree.toString();
         allMessages.add(new SystemMessage(fileTreeContext));
@@ -75,3 +75,5 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
         return 0;
     }
 }
+
+//System Prompt + File Tree + User message

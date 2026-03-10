@@ -1,6 +1,7 @@
 package com.project.loveable_clone.service;
 
 import com.project.loveable_clone.advice.exceptions.ResourceNotFoundException;
+import com.project.loveable_clone.dto.chat.StreamResponse;
 import com.project.loveable_clone.entity.*;
 import com.project.loveable_clone.enums.ChatEventType;
 import com.project.loveable_clone.enums.MessageRole;
@@ -12,9 +13,11 @@ import com.project.loveable_clone.repository.*;
 import com.project.loveable_clone.security.AuthUtil;
 import com.project.loveable_clone.service.interfaces.AiGenerationService;
 import com.project.loveable_clone.service.interfaces.ProjectFileService;
+import com.project.loveable_clone.service.interfaces.UsageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -44,13 +47,14 @@ public class AiGenerationServiceClass implements AiGenerationService {
     private final UserRepository userRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatEventRepository chatEventRepository;
+    private final UsageService usageService;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern
             .compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
 
     @Override
     @PreAuthorize("@security.hasPermissionToEdit(#projectId)")
-    public Flux<String> streamResponse(String userMessage, Long projectId){
+    public Flux<StreamResponse> streamResponse(String userMessage, Long projectId){
         Long userId = authUtil.getCurrentUserId();
         ChatSession chatSession = createChatSessionIfNotExists(projectId, userId);
 
@@ -63,6 +67,7 @@ public class AiGenerationServiceClass implements AiGenerationService {
         CodeGenerationTools codeGenerationTool = new CodeGenerationTools(projectFileService, projectId);
         AtomicReference<Long> startTime = new AtomicReference<>(System.currentTimeMillis());
         AtomicReference<Long> endTime = new AtomicReference<>(0L);
+        AtomicReference<Usage> usageRef = new AtomicReference<>();
 
         //TODO: track token use.
         return chatClient.prompt()
@@ -79,28 +84,43 @@ public class AiGenerationServiceClass implements AiGenerationService {
                     if(content != null && !content.isEmpty() && endTime.get() == 0) { // first non-empty chunk received
                         endTime.set(System.currentTimeMillis());
                     }
+
+                    if(response.getMetadata().getUsage() != null){
+                        usageRef.set(response.getMetadata().getUsage());
+                    }
+
                     fullResponseBuffer.append(content);
                 })
                 .doOnComplete(()->{
                     Schedulers.boundedElastic().schedule(()->{
 //                            parseAndSaveFiles(fullResponseBuffer.toString(), projectId)
                         long duration = (endTime.get() - startTime.get()) /  1000;
-                        finalizeChats(userMessage, chatSession, fullResponseBuffer.toString(), duration);
+                        finalizeChats(userMessage, chatSession, fullResponseBuffer.toString(), duration, usageRef.get());
                     });
                 })
                 .doOnError(error -> log.error("Error during streaming for projectId: {}", projectId))
-                .filter(response -> Objects.requireNonNull(response.getResult()).getOutput().getText() != null)
-                .map(response -> Objects.requireNonNull(Objects.requireNonNull(response.getResult()).getOutput().getText()));
+//                .filter(response -> Objects.requireNonNull(response.getResult()).getOutput().getText() != null)
+                .map(response -> {
+                    String text = Objects.requireNonNull(response.getResult()).getOutput().getText();
+                    return new StreamResponse(text != null ? text : "");
+                });
     }
 
-    private void finalizeChats(String userMessage, ChatSession chatSession, String fullText, Long duration) {
+    private void finalizeChats(String userMessage, ChatSession chatSession, String fullText, Long duration, Usage usage) {
         Long projectId = chatSession.getProject().getId();
+
+        if(usage != null){
+            int totalTokens = usage.getTotalTokens();
+            usageService.recordTokenUsage(chatSession.getUser().getId(), totalTokens);
+        }
+
         // Save the User message
         chatMessageRepository.save(
                 ChatMessage.builder()
                         .chatSession(chatSession)
                         .role(MessageRole.USER)
                         .content(userMessage)
+                        .tokenUsed(usage.getPromptTokens())
                         .build()
         );
 
@@ -108,6 +128,7 @@ public class AiGenerationServiceClass implements AiGenerationService {
                 .role(MessageRole.ASSISTANT)
                 .content("Assistant Message here...")
                 .chatSession(chatSession)
+                .tokenUsed(usage.getCompletionTokens())
                 .build();
 
         assistantChatMessage = chatMessageRepository.save(assistantChatMessage);

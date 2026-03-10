@@ -2,6 +2,7 @@ package com.project.loveable_clone.controller;
 
 import com.project.loveable_clone.dto.chat.ChatRequest;
 import com.project.loveable_clone.dto.chat.ChatResponse;
+import com.project.loveable_clone.dto.chat.StreamResponse;
 import com.project.loveable_clone.service.interfaces.AiGenerationService;
 import com.project.loveable_clone.service.interfaces.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,9 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping(path="/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> streamChat(@RequestBody ChatRequest request){
+    public Flux<ServerSentEvent<StreamResponse>> streamChat(@RequestBody ChatRequest request){
         return aiGenerationService.streamResponse(request.message(), request.projectId())
-                .map(data -> ServerSentEvent.<String>builder()
+                .map(data -> ServerSentEvent.<StreamResponse>builder()
                         .data(data)
                         .build());
     }
