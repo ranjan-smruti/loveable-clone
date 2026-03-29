@@ -1,0 +1,29 @@
+1. Deploy the Dashboard
+   Run the following command to apply the recommended Dashboard manifest:
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+2. Create an Admin User
+   By default, the dashboard is locked down. You need to create a "Service Account" with admin permissions to log in.
+   - Create the Account:
+        kubectl create serviceaccount admin-user -n kubernetes-dashboard
+
+   - Assign Admin Role:
+        kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
+
+   - Generate a Login Token:
+        kubectl -n kubernetes-dashboard create token admin-user
+     Copy the long string of characters provided; you will need this to log in.
+
+3. Access the GUI
+   Since Kind runs in Docker, the dashboard isn't automatically exposed to your browser. You need to create a tunnel:
+
+   - Start the Proxy:
+        kubectl proxy
+
+   - Open your Browser:
+        Navigate to the following URL:
+        http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+        Log In: Select "Token", paste the token you generated in Step 2, and you're in!
+
+4. Select the name-space from the drop-down to see all your pods, deployment and services.

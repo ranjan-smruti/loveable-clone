@@ -33,7 +33,7 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
 
     try {
       const response = await api.deploy(projectId);
-      setPreviewUrl(response.previewUrl);
+      setPreviewUrl(response.data.previewUrl);
       toast({
         title: "Deployment successful",
         description: "Your preview is now ready",

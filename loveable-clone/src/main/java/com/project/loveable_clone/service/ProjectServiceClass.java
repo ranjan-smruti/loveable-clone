@@ -39,6 +39,7 @@ public class ProjectServiceClass implements ProjectService {
     private final AuthUtil authUtil;
     private final SubscriptionService subscriptionService;
     private final ProjectTemplateService projectTemplateService;
+    private final KubernetesDeploymentService deploymentService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
@@ -114,6 +115,10 @@ public class ProjectServiceClass implements ProjectService {
         Project project = getAccessibleProjectById(projectId, userId);
 
         project.setDeletedAt(Instant.now());
+        
+        //Delete assigned pod for this project(if any)
+        deploymentService.deletePodOnProjectDelete(projectId);
+
         projectRepository.save(project);
     }
 

@@ -53,7 +53,7 @@ export function ProjectsDashboard() {
         setIsCreating(true);
         try {
             const newProject = await api.createProject(newProjectName);
-            setProjects([newProject, ...projects]);
+            setProjects([newProject.data, ...projects]);
             setNewProjectName("");
             setIsDialogOpen(false);
             toast({
