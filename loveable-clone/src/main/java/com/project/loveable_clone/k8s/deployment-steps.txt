@@ -1,0 +1,24 @@
+1. create kind cluster -> kind create cluster --name <cluster-name>
+2. create namespace -> kubectl create ns <namespace-name>
+3. Set default namespace -> kubectl config set-context --current --namespace=<namespace-name>
+4. create and apply runner-pods.yml
+5. create and apply infra.yml
+6. port foward the redis-server
+7. request the deploy endpoint and exec to the pod to check if the files got sync correctly and check /app/dev.log
+8. port forward the occupied pod and check if it is accessible. vite server uavailable response will show that it is accessible correctly.
+9. Build the proxy docker image
+10. Load the proxy image(as it is local) -> kind load docker-image <image:tag> --name <kind-cluster>
+11. apply poxy deployment and check the pod logs
+12. port foward the proxy to the local machine.(kubectl port-forward svc/lovable-proxy-svc 8090:80), and check by requesting localhost:8090
+13. port forward the redis-service for the access to proxy.
+14. request the deployment then exec and check the entry in redis pod, if they are correctly registered or not. (redis-cli KEYS *)
+15. now add the domain name to the hosts file under "C:\Windows\System32\drivers\etc"
+=============================================================================================
+enter into a pod -> kubectl exec -it <pod-name> -c <container-name> -- sh
+eg: kubectl exec -it runner-pod-AbcD12 -c runner -- sh
+
+port forward a pod -> kubectl port-forward <pod-name> host:conatiner
+
+build the proxy image -> docker  build -t <image:latest> .
+
+check logs -> kubectl logs -f <podname>
